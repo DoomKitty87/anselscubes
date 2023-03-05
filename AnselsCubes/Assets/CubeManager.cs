@@ -21,12 +21,12 @@ public class CubeManager : MonoBehaviour
     private bool turning = false;
     void Start()
     {
-        int i = 0;
-        foreach (GameObject obj in cubies) {
-            cubieInit[i].position = obj.transform.position;
-            cubieInit[i].rotation = obj.transform.rotation;
-            i++;
-        }
+      int i = 0;
+      foreach (GameObject obj in cubies) {
+          cubieInit[i].position = obj.transform.position;
+          cubieInit[i].rotation = obj.transform.rotation;
+          i++;
+      }
     }
 
     void Update()
@@ -72,6 +72,19 @@ public class CubeManager : MonoBehaviour
     }
 
     private void ResetCube() {
+        moveBuffer = new List<string>();
+        StopCoroutine("R");
+        StopCoroutine("RPrime");
+        StopCoroutine("L");
+        StopCoroutine("LPrime");
+        StopCoroutine("U");
+        StopCoroutine("UPrime");
+        StopCoroutine("D");
+        StopCoroutine("DPrime");
+        StopCoroutine("F");
+        StopCoroutine("FPrime");
+        StopCoroutine("B");
+        StopCoroutine("BPrime");
         int i = 0;
         foreach (GameObject obj in cubies) {
             obj.transform.position = cubieInit[i].position;
@@ -131,34 +144,13 @@ public class CubeManager : MonoBehaviour
     private IEnumerator R() {
         turning = true;
         GameObject[] affected = {cubies[cubieData[2]], cubies[cubieData[5]], cubies[cubieData[8]], cubies[cubieData[11]], cubies[cubieData[13]], cubies[cubieData[16]], cubies[cubieData[19]], cubies[cubieData[22]], cubies[cubieData[25]]};
-        float timer = 0;
-        Vector3[] targetPos = new Vector3[9];
-        Vector3[] initPos = new Vector3[9];
-        Quaternion[] targetRot = new Quaternion[9];
-        Quaternion[] initRot = new Quaternion[9];
-        int i = 0;
-        foreach(GameObject obj in affected) {
-            initPos[i] = obj.transform.position;
-            initRot[i] = obj.transform.rotation;
-            targetPos[i] = (Quaternion.Euler(0, 0, -90) * (obj.transform.position - cubies[cubieData[13]].transform.position));
-            targetRot[i] = obj.transform.rotation * Quaternion.Euler(0, 0, -90);
-            i++;
-        }
-        while (timer < (1 / moveSpeed)) {
-            i = 0;
+        float rot = 0;
+        while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.position = Vector3.Lerp(initPos[i], targetPos[i], timer * moveSpeed);
-                obj.transform.rotation = Quaternion.Lerp(initRot[i], targetRot[i], timer * moveSpeed);
-                i++;
+                obj.transform.RotateAround(cubies[cubieData[13]].transform.position, Vector3.forward, (90 - rot > moveSpeed) ? -moveSpeed : -90 + rot);
             }
-            timer += Time.deltaTime;
-            yield return null;
-        }
-        i = 0;
-        foreach(GameObject obj in affected) {
-            obj.transform.position = targetPos[i];
-            obj.transform.rotation = targetRot[i];
-            i++;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[0], cubieData[1], cubieData[8], cubieData[3], cubieData[4], cubieData[16], cubieData[6], cubieData[7], cubieData[25], cubieData[9], cubieData[10], cubieData[5], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[22], cubieData[17], cubieData[18], cubieData[2], cubieData[20], cubieData[21], cubieData[11], cubieData[23], cubieData[24], cubieData[19]};
         turning = false;
@@ -170,10 +162,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[13]].transform.position, Vector3.forward, 90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[13]].transform.position, Vector3.forward, (90 - rot > moveSpeed) ? moveSpeed : 90 - rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[0], cubieData[1], cubieData[19], cubieData[3], cubieData[4], cubieData[11], cubieData[6], cubieData[7], cubieData[2], cubieData[9], cubieData[10], cubieData[22], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[5], cubieData[17], cubieData[18], cubieData[25], cubieData[20], cubieData[21], cubieData[16], cubieData[23], cubieData[24], cubieData[8]};
         turning = false;
@@ -185,10 +177,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[12]].transform.position, Vector3.forward, -90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[12]].transform.position, Vector3.forward, (90 - rot > moveSpeed) ? -moveSpeed : -90 + rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[6], cubieData[1], cubieData[2], cubieData[14], cubieData[4], cubieData[5], cubieData[23], cubieData[7], cubieData[8], cubieData[3], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[20], cubieData[15], cubieData[16], cubieData[0], cubieData[18], cubieData[19], cubieData[9], cubieData[21], cubieData[22], cubieData[17], cubieData[24], cubieData[25]};
         turning = false;
@@ -200,10 +192,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[12]].transform.position, Vector3.forward, 90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[12]].transform.position, Vector3.forward, (90 - rot > moveSpeed) ? moveSpeed : 90 - rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[17], cubieData[1], cubieData[2], cubieData[9], cubieData[4], cubieData[5], cubieData[0], cubieData[7], cubieData[8], cubieData[20], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[3], cubieData[15], cubieData[16], cubieData[23], cubieData[18], cubieData[19], cubieData[14], cubieData[21], cubieData[22], cubieData[6], cubieData[24], cubieData[25]};
         turning = false;
@@ -215,10 +207,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[21]].transform.position, Vector3.up, 90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[21]].transform.position, Vector3.up, (90 - rot > moveSpeed) ? moveSpeed : 90 - rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[0], cubieData[1], cubieData[2], cubieData[3], cubieData[4], cubieData[5], cubieData[6], cubieData[7], cubieData[8], cubieData[9], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[16], cubieData[19], cubieData[22], cubieData[25], cubieData[18], cubieData[21], cubieData[24], cubieData[17], cubieData[20], cubieData[23]};
         turning = false;
@@ -230,10 +222,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[21]].transform.position, Vector3.up, -90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[21]].transform.position, Vector3.up, (90 - rot > moveSpeed) ? -moveSpeed : -90 + rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[0], cubieData[1], cubieData[2], cubieData[3], cubieData[4], cubieData[5], cubieData[6], cubieData[7], cubieData[8], cubieData[9], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[16], cubieData[23], cubieData[20], cubieData[17], cubieData[24], cubieData[21], cubieData[18], cubieData[25], cubieData[22], cubieData[19]};
         turning = false;
@@ -245,10 +237,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[4]].transform.position, Vector3.up, -90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[4]].transform.position, Vector3.up, (90 - rot > moveSpeed) ? -moveSpeed : -90 + rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[6], cubieData[3], cubieData[0], cubieData[7], cubieData[4], cubieData[1], cubieData[8], cubieData[5], cubieData[2], cubieData[9], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[16], cubieData[17], cubieData[18], cubieData[19], cubieData[20], cubieData[21], cubieData[22], cubieData[23], cubieData[24], cubieData[25]};
         turning = false;
@@ -260,10 +252,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[4]].transform.position, Vector3.up, 90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[4]].transform.position, Vector3.up, (90 - rot > moveSpeed) ? moveSpeed : 90 - rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[2], cubieData[5], cubieData[8], cubieData[1], cubieData[4], cubieData[7], cubieData[0], cubieData[3], cubieData[6], cubieData[9], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[16], cubieData[17], cubieData[18], cubieData[19], cubieData[20], cubieData[21], cubieData[22], cubieData[23], cubieData[24], cubieData[25]};
         turning = false;
@@ -275,10 +267,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[10]].transform.position, Vector3.right, -90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[10]].transform.position, Vector3.right, (90 - rot > moveSpeed) ? -moveSpeed : -90 + rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[2], cubieData[11], cubieData[19], cubieData[3], cubieData[4], cubieData[5], cubieData[6], cubieData[7], cubieData[8], cubieData[1], cubieData[10], cubieData[18], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[16], cubieData[0], cubieData[9], cubieData[17], cubieData[20], cubieData[21], cubieData[22], cubieData[23], cubieData[24], cubieData[25]};
         turning = false;
@@ -290,10 +282,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[10]].transform.position, Vector3.right, 90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[10]].transform.position, Vector3.right, (90 - rot > moveSpeed) ? moveSpeed : 90 - rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[17], cubieData[9], cubieData[0], cubieData[3], cubieData[4], cubieData[5], cubieData[6], cubieData[7], cubieData[8], cubieData[18], cubieData[10], cubieData[1], cubieData[12], cubieData[13], cubieData[14], cubieData[15], cubieData[16], cubieData[19], cubieData[11], cubieData[2], cubieData[20], cubieData[21], cubieData[22], cubieData[23], cubieData[24], cubieData[25]};
         turning = false;
@@ -305,10 +297,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[15]].transform.position, Vector3.right, 90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[15]].transform.position, Vector3.right, (90 - rot > moveSpeed) ? moveSpeed : 90 - rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[0], cubieData[1], cubieData[2], cubieData[3], cubieData[4], cubieData[5], cubieData[23], cubieData[14], cubieData[6], cubieData[9], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[24], cubieData[15], cubieData[7], cubieData[17], cubieData[18], cubieData[19], cubieData[20], cubieData[21], cubieData[22], cubieData[25], cubieData[16], cubieData[8]};
         turning = false;
@@ -320,10 +312,10 @@ public class CubeManager : MonoBehaviour
         float rot = 0;
         while (rot < 90) {
             foreach(GameObject obj in affected) {
-                obj.transform.RotateAround(cubies[cubieData[15]].transform.position, Vector3.right, -90 * Time.deltaTime * moveSpeed);
+                obj.transform.RotateAround(cubies[cubieData[15]].transform.position, Vector3.right, (90 - rot > moveSpeed) ? -moveSpeed : -90 + rot);
             }
-            rot += 90 * Time.deltaTime * moveSpeed;
-            yield return null;
+            rot += moveSpeed;
+            yield return new WaitForFixedUpdate();
         }
         cubieData = new int[] {cubieData[0], cubieData[1], cubieData[2], cubieData[3], cubieData[4], cubieData[5], cubieData[8], cubieData[16], cubieData[25], cubieData[9], cubieData[10], cubieData[11], cubieData[12], cubieData[13], cubieData[7], cubieData[15], cubieData[24], cubieData[17], cubieData[18], cubieData[19], cubieData[20], cubieData[21], cubieData[22], cubieData[6], cubieData[14], cubieData[23]};
         turning = false;
